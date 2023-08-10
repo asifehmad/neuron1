@@ -117,7 +117,11 @@ class OpenLlamaMiner(bittensor.HuggingFaceMiner):
         bittensor.logging.info("Loading " + str(self.config.open_llama.model_name))
 
         # loading the tokenizer
-        self.tokenizer = LlamaTokenizer.from_pretrained(self.config.open_llama.model_name, use_fast=True)
+        # self.tokenizer = LlamaTokenizer.from_pretrained(self.config.open_llama.model_name, use_fast=True)
+        def load_tokenizer(self):
+            return LlamaTokenizer.from_pretrained(
+            self.config.open_llama.model_name, use_fast=True
+        )
 
         if self.config.deployment_framework == "deepspeed":
             # distributed setup
@@ -129,7 +133,7 @@ class OpenLlamaMiner(bittensor.HuggingFaceMiner):
             torch.cuda.set_device(self.local_rank)
             deepspeed.init_distributed()
 
-            self.tokenizer = LlamaTokenizer.from_pretrained(self.config.llama.model_name, use_fast=True)
+            # self.tokenizer = LlamaTokenizer.from_pretrained(self.config.llama.model_name, use_fast=True)
 
             config = AutoConfig.from_pretrained(
                 self.config.open_llama.model_name, trust_remote_code=True, torch_dtype=torch.float16, low_cpu_mem_usage=False
@@ -189,10 +193,14 @@ class OpenLlamaMiner(bittensor.HuggingFaceMiner):
             dschf = HfDeepSpeedConfig(ds_config)  # keep this object alive
 
             # now a model can be loaded.
-            self.model = LlamaForCausalLM.from_pretrained(
-                self.config.open_llama.model_name, trust_remote_code=True, torch_dtype=torch.float16, low_cpu_mem_usage=False
-            )
-
+            # self.model = LlamaForCausalLM.from_pretrained(
+            #     self.config.open_llama.model_name, trust_remote_code=True, torch_dtype=torch.float16, low_cpu_mem_usage=False
+            # )
+            def load_model(self):
+                return LlamaForCausalLM.from_pretrained(
+                      self.config.open_llama.model_name,  trust_remote_code=True,
+                      torch_dtype=torch.float16,
+                      low_cpu_mem_usage=False)
             # initialise deepspeed ZeRO
             self.ds_engine = deepspeed.initialize(
                 model=self.model,
