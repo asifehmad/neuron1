@@ -37,15 +37,11 @@ class OpenLlamaMiner(bittensor.HuggingFaceMiner):
         )
 
     def load_model(self):
-        model = LlamaForCausalLM.from_pretrained(
+        return deepspeed.init_inference( model=LlamaForCausalLM.from_pretrained(
             self.config.open_llama.model_name,
             torch_dtype=torch.float16,
             low_cpu_mem_usage=True, device_map=local_rank
-        )
-        print('Loading Model for DeepSpeed now!')
-        model = deepspeed.init_inference( model=model, mp_size=world_size, dtype=torch.float16, replace_method="auto", replace_with_kernel_inject=True, max_out_tokens=12000)
-        print('Loaded the Model for DeepSpeed!')
-        return model
+        ), mp_size=world_size, dtype=torch.float16, replace_method="auto", replace_with_kernel_inject=True, max_out_tokens=12000)
 
     def forward(self, messages: List[Dict[str, str]]) -> str:
         history = self.process_history(messages)
