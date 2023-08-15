@@ -54,11 +54,7 @@ class OpenLlamaMiner(bittensor.HuggingFaceMiner):
         input_ids = self.tokenizer.encode(prompt, return_tensors="pt").to(model.device)
         output = self.model.generate(
             input_ids,
-            max_length=input_ids.shape[1] + self.config.open_llama.max_new_tokens,
-            temperature=self.config.open_llama.temperature,
-            do_sample=self.config.open_llama.do_sample,
-            pad_token_id=self.tokenizer.eos_token_id,
-        )
+            max_length=input_ids.shape[1] + self.config.open_llama.max_new_tokens)
 
         generation = self.tokenizer.decode(
             output[0][input_ids.shape[1] :], skip_special_tokens=True
