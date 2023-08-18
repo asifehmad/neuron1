@@ -55,13 +55,18 @@ class OpenLlamaMiner(bittensor.HuggingFaceMiner):
         generation = self.tokenizer.decode(
             output[0][input_ids.shape[1] :], skip_special_tokens=True
         )
-        generation = generation.split("User:")[0].strip()
-
+        if local_rank==0:
+            generation = generation.split("User:")[0].strip()
+            bittensor.logging.debug("Prompt: " + str(prompt))
+            bittensor.logging.debug("Message: " + str(messages))
+            bittensor.logging.debug("Generation: " + str(generation).replace("<", "-"))
+            return generation
+        
         # Logging input and generation if debugging is active
-        bittensor.logging.debug("Prompt: " + str(prompt))
-        bittensor.logging.debug("Message: " + str(messages))
-        bittensor.logging.debug("Generation: " + str(generation).replace("<", "-"))
-        return generation
+        # bittensor.logging.debug("Prompt: " + str(prompt))
+        # bittensor.logging.debug("Message: " + str(messages))
+        # bittensor.logging.debug("Generation: " + str(generation).replace("<", "-"))
+        # return generation
 
 
 if __name__ == "__main__":
