@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 
 local_rank = int(os.getenv("LOCAL_RANK", "0"))
-world_size = int(os.getenv("WORLD_SIZE", "1"))
+world_size = int(os.getenv("WORLD_SIZE", "2"))
 
 deepspeed.init_distributed()
 rank = dist.get_rank()
