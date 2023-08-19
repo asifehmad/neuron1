@@ -21,13 +21,13 @@ print(f"========Current randk:{rank} || lcoal rank:{local_rank} || world size:{w
 model_path = 'asifhugs/open_llama_7b'
 
 config = AutoConfig.from_pretrained(model_path)
-checkpoints_json = model_path+"checkpoints.json"
-if rank==0:
-  with io.open(checkpoints_json, "w", encoding="utf-8") as f:
-    file_list = [str(entry) for entry in Path(model_path).rglob("*.[bp][it][n]") if entry.is_file()]
-    data = {"type": "BLOOM", "checkpoints": file_list, "version": 1.0}
-    json.dump(data, f)
-    dist.barrier()
+# checkpoints_json = model_path+"checkpoints.json"
+# if rank==0:
+#   with io.open(checkpoints_json, "w", encoding="utf-8") as f:
+#     file_list = [str(entry) for entry in Path(model_path).rglob("*.[bp][it][n]") if entry.is_file()]
+#     data = {"type": "BLOOM", "checkpoints": file_list, "version": 1.0}
+#     json.dump(data, f)
+#     dist.barrier()
 
 tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=True)
 with deepspeed.OnDevice(dtype=torch.float16, device="meta"):
@@ -37,10 +37,10 @@ model = model.eval()
 ds_model = deepspeed.init_inference(
 model,
 mp_size=world_size,
-dtype=torch.float16,
-base_dir=model_path,
-replace_with_kernel_inject=True,
-checkpoint=checkpoints_json,
+dtype=torch.float16, replace_method="auto", replace_with_kernel_inject=True, max_out_tokens=12000
+# base_dir=model_path,
+# replace_with_kernel_inject=True,
+# checkpoint=checkpoints_json,
 )
 
 prompt = "Where is Hawaii?"
